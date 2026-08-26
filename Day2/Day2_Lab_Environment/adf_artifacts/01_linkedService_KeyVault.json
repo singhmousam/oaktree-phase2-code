@@ -1,0 +1,12 @@
+{
+  "name": "LS_KeyVault_OakTree",
+  "type": "Microsoft.DataFactory/factories/linkedservices",
+  "properties": {
+    "type": "AzureKeyVault",
+    "typeProperties": {
+      "baseUrl": "https://<KEYVAULT_NAME>.vault.azure.net/"
+    },
+    "annotations": ["Day2-ADF-Lab"],
+    "description": "Secrets store for the SQL admin password. ADF's managed identity was granted get/list on this vault by 01_provision_infra.sh — no secrets are ever typed into ADF directly."
+  }
+}

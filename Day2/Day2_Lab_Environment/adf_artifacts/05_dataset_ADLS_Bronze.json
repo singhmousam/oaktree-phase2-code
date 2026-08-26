@@ -1,0 +1,24 @@
+{
+  "name": "DS_ADLS_Bronze_Trades",
+  "type": "Microsoft.DataFactory/factories/datasets",
+  "properties": {
+    "type": "Parquet",
+    "linkedServiceName": {
+      "referenceName": "LS_ADLS_OakTreeLake",
+      "type": "LinkedServiceReference"
+    },
+    "parameters": {
+      "windowDate": { "type": "string" }
+    },
+    "typeProperties": {
+      "location": {
+        "type": "AzureBlobFSLocation",
+        "fileSystem": "bronze",
+        "folderPath": "trades/@{dataset().windowDate}"
+      },
+      "compressionCodec": "snappy"
+    },
+    "annotations": ["Day2-ADF-Lab"],
+    "description": "Bronze layer sink — an exact, append-only copy of the day's raw trade_blotter rows, partitioned into one folder per windowDate. No transformation happens here; this is the immutable audit-trail copy from Day 1's Medallion Architecture."
+  }
+}

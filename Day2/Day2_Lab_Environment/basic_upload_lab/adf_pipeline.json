@@ -1,0 +1,34 @@
+{
+  "name": "pipeline_dedup_and_partition",
+  "properties": {
+    "activities": [
+      {
+        "name": "Check_File_Exists",
+        "type": "GetMetadata",
+        "typeProperties": {
+          "dataset": {
+            "referenceName": "ds_csv_input",
+            "type": "DatasetReference"
+          },
+          "fieldList": ["exists", "childItems"]
+        }
+      },
+      {
+        "name": "Deduplicate_And_Partition_Flow",
+        "type": "ExecuteDataFlow",
+        "dependsOn": [
+          {
+            "activity": "Check_File_Exists",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "dataflow": {
+            "referenceName": "df_dedup_partition_logic",
+            "type": "DataFlowReference"
+          }
+        }
+      }
+    ]
+  }
+}

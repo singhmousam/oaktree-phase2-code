@@ -1,0 +1,28 @@
+{
+  "name": "TR_Daily_3AM_TradeBlotter",
+  "type": "Microsoft.DataFactory/factories/triggers",
+  "properties": {
+    "type": "ScheduleTrigger",
+    "typeProperties": {
+      "recurrence": {
+        "frequency": "Day",
+        "interval": 1,
+        "startTime": "2026-05-02T03:00:00Z",
+        "timeZone": "UTC"
+      }
+    },
+    "pipelines": [
+      {
+        "pipelineReference": {
+          "referenceName": "PL_TradeBlotter_Bronze_to_Silver",
+          "type": "PipelineReference"
+        },
+        "parameters": {
+          "windowDate": "@formatDateTime(addDays(trigger().scheduledTime, -1), 'yyyy-MM-dd')"
+        }
+      }
+    ],
+    "annotations": ["Day2-ADF-Lab"],
+    "description": "Fires daily at 03:00 UTC, processing the PREVIOUS day's trades (windowDate = scheduled time minus 1 day) — matching the case brief's '2 AM reconciliation job completing first, then the report pipeline runs' sequencing from Day 1/2."
+  }
+}

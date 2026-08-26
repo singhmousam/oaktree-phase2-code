@@ -1,0 +1,20 @@
+{
+  "name": "LS_AzureSqlDatabase_OakTreeSource",
+  "type": "Microsoft.DataFactory/factories/linkedservices",
+  "properties": {
+    "type": "AzureSqlDatabase",
+    "typeProperties": {
+      "connectionString": "Server=tcp:<SQL_SERVER_NAME>.database.windows.net,1433;Database=<SQL_DB_NAME>;User ID=<SQL_ADMIN_USER>;Encrypt=true;Connection Timeout=30;",
+      "password": {
+        "type": "AzureKeyVaultSecret",
+        "store": {
+          "referenceName": "LS_KeyVault_OakTree",
+          "type": "LinkedServiceReference"
+        },
+        "secretName": "sql-admin-password"
+      }
+    },
+    "annotations": ["Day2-ADF-Lab"],
+    "description": "Points at the Azure SQL Database standing in for OakTree's legacy trade blotter system (Day 1 case study). Password is pulled from Key Vault at runtime, never stored in ADF."
+  }
+}

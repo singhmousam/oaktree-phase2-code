@@ -1,0 +1,28 @@
+{
+  "name": "DS_Sql_TradeBlotterSilver",
+  "type": "Microsoft.DataFactory/factories/datasets",
+  "properties": {
+    "type": "AzureSqlTable",
+    "linkedServiceName": {
+      "referenceName": "LS_AzureSqlDatabase_OakTreeSource",
+      "type": "LinkedServiceReference"
+    },
+    "schema": [
+      { "name": "trade_id", "type": "bigint" },
+      { "name": "trade_date", "type": "date" },
+      { "name": "security_id", "type": "int" },
+      { "name": "trader_id", "type": "int" },
+      { "name": "trade_type", "type": "varchar" },
+      { "name": "quantity", "type": "decimal" },
+      { "name": "price", "type": "decimal" },
+      { "name": "trade_value", "type": "decimal" },
+      { "name": "silver_loaded_ts", "type": "datetime2" }
+    ],
+    "typeProperties": {
+      "schema": "dbo",
+      "table": "trade_blotter_silver"
+    },
+    "annotations": ["Day2-ADF-Lab"],
+    "description": "Source dataset for the final export Copy Activity — reads the cleaned rows the stored procedure just produced, filtered to today's windowDate, and lands them in the ADLS silver/ container as Parquet for Day 3 (PySpark) and Day 4 (Fabric) to consume."
+  }
+}

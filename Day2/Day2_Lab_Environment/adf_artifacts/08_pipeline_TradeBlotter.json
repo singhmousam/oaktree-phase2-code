@@ -1,0 +1,104 @@
+{
+  "name": "PL_TradeBlotter_Bronze_to_Silver",
+  "type": "Microsoft.DataFactory/factories/pipelines",
+  "properties": {
+    "description": "End-to-end Day 2 lab pipeline: extracts one day's trades from the SQL source (Bronze), calls a T-SQL stored procedure to dedupe/clean/enrich them (the Transform step), then exports the cleaned rows to the ADLS Silver container as Parquet for Day 3/4 to consume. Mirrors the exact architecture mapped in the Day 1 Legacy-to-Lakehouse worksheet.",
+    "parameters": {
+      "windowDate": {
+        "type": "string",
+        "defaultValue": "2026-05-01"
+      }
+    },
+    "activities": [
+      {
+        "name": "Copy_Blotter_To_Bronze",
+        "type": "Copy",
+        "typeProperties": {
+          "source": {
+            "type": "AzureSqlSource",
+            "sqlReaderQuery": "SELECT trade_id, trade_date, security_id, trader_id, trade_type, quantity, price, last_modified_ts FROM dbo.trade_blotter WHERE trade_date = '@{pipeline().parameters.windowDate}'"
+          },
+          "sink": {
+            "type": "ParquetSink",
+            "storeSettings": { "type": "AzureBlobFSWriteSettings" }
+          }
+        },
+        "inputs": [
+          { "referenceName": "DS_Sql_TradeBlotter", "type": "DatasetReference" }
+        ],
+        "outputs": [
+          {
+            "referenceName": "DS_ADLS_Bronze_Trades",
+            "type": "DatasetReference",
+            "parameters": { "windowDate": "@pipeline().parameters.windowDate" }
+          }
+        ],
+        "policy": { "timeout": "0.01:00:00", "retry": 3, "retryIntervalInSeconds": 60 }
+      },
+      {
+        "name": "Transform_Bronze_To_Silver",
+        "type": "SqlServerStoredProcedure",
+        "dependsOn": [
+          { "activity": "Copy_Blotter_To_Bronze", "dependencyConditions": ["Succeeded"] }
+        ],
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[usp_transform_trades_to_silver]",
+          "storedProcedureParameters": {
+            "WindowDate": { "value": "@pipeline().parameters.windowDate", "type": "Date" }
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "LS_AzureSqlDatabase_OakTreeSource",
+          "type": "LinkedServiceReference"
+        },
+        "policy": { "timeout": "0.00:30:00", "retry": 2, "retryIntervalInSeconds": 30 }
+      },
+      {
+        "name": "Copy_Silver_To_Lake",
+        "type": "Copy",
+        "dependsOn": [
+          { "activity": "Transform_Bronze_To_Silver", "dependencyConditions": ["Succeeded"] }
+        ],
+        "typeProperties": {
+          "source": {
+            "type": "AzureSqlSource",
+            "sqlReaderQuery": "SELECT trade_id, trade_date, security_id, trader_id, trade_type, quantity, price, trade_value, silver_loaded_ts FROM dbo.trade_blotter_silver WHERE trade_date = '@{pipeline().parameters.windowDate}'"
+          },
+          "sink": {
+            "type": "ParquetSink",
+            "storeSettings": { "type": "AzureBlobFSWriteSettings" }
+          }
+        },
+        "inputs": [
+          { "referenceName": "DS_Sql_TradeBlotterSilver", "type": "DatasetReference" }
+        ],
+        "outputs": [
+          {
+            "referenceName": "DS_ADLS_Silver_Trades",
+            "type": "DatasetReference",
+            "parameters": { "windowDate": "@pipeline().parameters.windowDate" }
+          }
+        ],
+        "policy": { "timeout": "0.01:00:00", "retry": 3, "retryIntervalInSeconds": 60 }
+      },
+      {
+        "name": "Notify_On_Failure",
+        "type": "WebActivity",
+        "dependsOn": [
+          { "activity": "Copy_Blotter_To_Bronze", "dependencyConditions": ["Failed"] },
+          { "activity": "Transform_Bronze_To_Silver", "dependencyConditions": ["Failed"] },
+          { "activity": "Copy_Silver_To_Lake", "dependencyConditions": ["Failed"] }
+        ],
+        "typeProperties": {
+          "url": "https://<YOUR-TEAMS-OR-LOGIC-APP-WEBHOOK-URL>",
+          "method": "POST",
+          "body": {
+            "text": "PL_TradeBlotter_Bronze_to_Silver FAILED for windowDate=@{pipeline().parameters.windowDate}. Check the ADF Monitoring Hub."
+          }
+        },
+        "description": "No silent failures (Day 1 principle). Replace the placeholder URL with a real Teams incoming webhook or Logic App endpoint before relying on this in anything beyond the lab."
+      }
+    ],
+    "annotations": ["Day2-ADF-Lab"]
+  }
+}

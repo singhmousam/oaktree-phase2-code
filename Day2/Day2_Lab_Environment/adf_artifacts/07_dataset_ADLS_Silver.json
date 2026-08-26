@@ -1,0 +1,24 @@
+{
+  "name": "DS_ADLS_Silver_Trades",
+  "type": "Microsoft.DataFactory/factories/datasets",
+  "properties": {
+    "type": "Parquet",
+    "linkedServiceName": {
+      "referenceName": "LS_ADLS_OakTreeLake",
+      "type": "LinkedServiceReference"
+    },
+    "parameters": {
+      "windowDate": { "type": "string" }
+    },
+    "typeProperties": {
+      "location": {
+        "type": "AzureBlobFSLocation",
+        "fileSystem": "silver",
+        "folderPath": "trades/@{dataset().windowDate}"
+      },
+      "compressionCodec": "snappy"
+    },
+    "annotations": ["Day2-ADF-Lab"],
+    "description": "Silver layer sink — deduplicated, data-quality-checked, trade_value-enriched rows for this windowDate. This is what Day 3's PySpark demo and Day 4's Fabric Lakehouse Shortcut both read from."
+  }
+}

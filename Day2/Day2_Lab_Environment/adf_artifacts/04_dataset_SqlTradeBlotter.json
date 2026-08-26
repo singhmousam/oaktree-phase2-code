@@ -1,0 +1,27 @@
+{
+  "name": "DS_Sql_TradeBlotter",
+  "type": "Microsoft.DataFactory/factories/datasets",
+  "properties": {
+    "type": "AzureSqlTable",
+    "linkedServiceName": {
+      "referenceName": "LS_AzureSqlDatabase_OakTreeSource",
+      "type": "LinkedServiceReference"
+    },
+    "schema": [
+      { "name": "trade_id", "type": "bigint" },
+      { "name": "trade_date", "type": "date" },
+      { "name": "security_id", "type": "int" },
+      { "name": "trader_id", "type": "int" },
+      { "name": "trade_type", "type": "varchar" },
+      { "name": "quantity", "type": "decimal" },
+      { "name": "price", "type": "decimal" },
+      { "name": "last_modified_ts", "type": "datetime2" }
+    ],
+    "typeProperties": {
+      "schema": "dbo",
+      "table": "trade_blotter"
+    },
+    "annotations": ["Day2-ADF-Lab"],
+    "description": "Source dataset for the Bronze Copy Activity. The pipeline filters this table by trade_date using a dynamic query rather than reading the whole table every run."
+  }
+}

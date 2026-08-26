@@ -1,0 +1,12 @@
+{
+  "name": "LS_ADLS_OakTreeLake",
+  "type": "Microsoft.DataFactory/factories/linkedservices",
+  "properties": {
+    "type": "AzureBlobFS",
+    "typeProperties": {
+      "url": "https://<STORAGE_ACCOUNT_NAME>.dfs.core.windows.net"
+    },
+    "annotations": ["Day2-ADF-Lab"],
+    "description": "ADLS Gen2 lakehouse landing zone. Uses ADF's system-assigned managed identity (granted 'Storage Blob Data Contributor' by 01_provision_infra.sh) — no storage account key is stored in ADF at all. This is the least-privilege pattern from Day 1's security-by-design lifecycle."
+  }
+}

@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Extra directories to ignore
+op2/*
+*.DS_Store*
+*.env
