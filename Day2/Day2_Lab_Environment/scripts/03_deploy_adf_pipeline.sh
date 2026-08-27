@@ -46,7 +46,7 @@ substitute() {
     -e "s/<SQL_DB_NAME>/${SQL_DB_NAME}/g" \
     -e "s/<SQL_ADMIN_USER>/${SQL_ADMIN_USER}/g" \
     -e "s/<STORAGE_ACCOUNT_NAME>/${STORAGE_ACCOUNT_NAME}/g" \
-    "${infile}" > "${outfile}"
+    "${infile}" | python3 -c "import sys, json; print(json.dumps(json.load(sys.stdin)['properties']))" > "${outfile}"
 }
 
 for f in "${ARTIFACT_DIR}"/*.json; do
