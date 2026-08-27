@@ -16,6 +16,15 @@
 # =============================================================================
 set -euo pipefail
 
+if ! command -v jq >/dev/null 2>&1; then
+  echo "ERROR: jq is required to prepare the ADF JSON payloads."
+  echo "Install it with one of these commands, then rerun this script:"
+  echo "  Ubuntu/Debian: sudo apt-get update && sudo apt-get install -y jq"
+  echo "  RHEL/Fedora:   sudo dnf install -y jq"
+  echo "  Alpine:        sudo apk add jq"
+  exit 1
+fi
+
 if [ ! -f "./lab_environment.env" ]; then
   echo "ERROR: lab_environment.env not found. Run 01_provision_infra.sh first."
   exit 1
@@ -37,7 +46,7 @@ substitute() {
     -e "s/<SQL_DB_NAME>/${SQL_DB_NAME}/g" \
     -e "s/<SQL_ADMIN_USER>/${SQL_ADMIN_USER}/g" \
     -e "s/<STORAGE_ACCOUNT_NAME>/${STORAGE_ACCOUNT_NAME}/g" \
-    "${infile}" | jq -c '.properties' > "${outfile}"
+    "${infile}" > "${outfile}"
 }
 
 for f in "${ARTIFACT_DIR}"/*.json; do
