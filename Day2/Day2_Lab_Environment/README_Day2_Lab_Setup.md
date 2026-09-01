@@ -81,7 +81,7 @@ cd Day2/Day2_Lab_Environment/scripts
 
 # 1. Provision everything: Resource Group, SQL Server+DB, Storage (ADLS Gen2),
 #    Key Vault, Data Factory, and least-privilege role assignments.
-./01_provision_infra.sh oaktreelab-team1        # pass a unique suffix per team
+./01_provision_infra.sh oaktreelab-nav      # pass a unique suffix per team
 
 # On 'RequestDisallowedByPolicy' error allow the specific resources as needed for this run
 az provider register --namespace Microsoft.Sql 
