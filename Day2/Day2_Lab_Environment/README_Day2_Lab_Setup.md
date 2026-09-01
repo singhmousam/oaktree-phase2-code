@@ -60,6 +60,22 @@ day2_lab/
 
 ## Run order (do this once per participant/team before Day 2)
 
+### Linux prerequisites
+
+The deployment script uses `jq` to extract the inner `properties` object from
+each ADF JSON artifact. Install it once on the Linux VDI before deployment:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get update && sudo apt-get install -y jq
+
+# RHEL/Fedora
+sudo dnf install -y jq
+
+# Alpine
+sudo apk add jq
+```
+
 ```bash
 cd Day2/Day2_Lab_Environment/scripts
 
@@ -127,3 +143,10 @@ rows** after de-duplication (keeping the latest `last_modified_ts` per
 | Day 6 (Power BI) | The semantic model and DAX measures are built on a Gold table derived from this same `trade_blotter_silver` shape |
 | Day 7 (Migration) | This IS the "modernized" version of the Day 1 legacy case — the roadmap you built on Day 1 describes exactly this build |
 | Day 8 (Governance) | The Key Vault + managed-identity + least-privilege role assignment pattern here is the concrete implementation of Day 8's access control matrix |
+
+## Notes
+- Dataset parameter: {layer}/{trades/@{dataset().windowDate}}
+
+- Pipeline builder: SELECT trade_id, trade_date, security_id, trader_id, trade_type, quantity, price, last_modified_ts FROM dbo.trade_blotter WHERE trade_date = '@{pipeline().parameters.windowDate}'
+- Experssion builder: @pipeline().parameters.windowDate
+

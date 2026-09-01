@@ -1,0 +1,9 @@
+security_id,ticker,security_name,asset_class,sector,currency
+1,INFY,Infosys Ltd,Equity,Technology,INR
+2,HDFCB,HDFC Bank,Equity,Financials,INR
+3,GS10Y,10Y Govt Bond,Fixed Income,Sovereign,INR
+4,TCS,Tata Consultancy Svc,Equity,Technology,INR
+5,RELI,Reliance Industries,Equity,Energy,INR
+6,ICICI,ICICI Bank,Equity,Financials,INR
+7,CORP5Y,5Y Corporate Bond,Fixed Income,Corporate,INR
+8,SUZUK,Maruti Suzuki,Equity,Auto,INR
