@@ -28,10 +28,10 @@ LOCATION="${LOCATION:-canadacentral}"
 SUFFIX="${1:-oaktreelab-ms}"
 RESOURCE_GROUP="${RESOURCE_GROUP:-rg-${SUFFIX}}"
 DATABRICKS_WORKSPACE_NAME="dbw-${SUFFIX}"
-CLUSTER_NAME="day3-training-cluster"
+CLUSTER_NAME="day5-training-cluster"
 
 echo "=============================================================="
-echo " Provisioning Day 3 Databricks environment"
+echo " Provisioning Day 5 Databricks environment"
 echo "   Resource Group      : ${RESOURCE_GROUP}"
 echo "   Databricks Workspace: ${DATABRICKS_WORKSPACE_NAME}"
 echo "=============================================================="
@@ -84,7 +84,8 @@ CLUSTER_RESPONSE=$(curl -s -X POST "${API_BASE}/clusters/create" \
       "spark.databricks.delta.preview.enabled": "true"
     }
   }')
-CLUSTER_ID=$(echo "${CLUSTER_RESPONSE}" | jq -r '.cluster_id')
+# CLUSTER_ID=$(echo "${CLUSTER_RESPONSE}" | jq -r '.cluster_id')
+CLUSTER_ID=$(echo "${CLUSTER_RESPONSE}" | grep -o '"cluster_id": *"[^"]*"' | cut -d'"' -f4)
 
 if [ "${CLUSTER_ID}" == "null" ] || [ -z "${CLUSTER_ID}" ]; then
   echo "ERROR creating cluster. Response was:"
@@ -94,7 +95,7 @@ fi
 echo "   Cluster ID: ${CLUSTER_ID} (starting in the background — takes ~5 minutes)"
 
 # ----------------------------- 5. IMPORT ALL FIVE NOTEBOOKS -----------------
-echo ">> [4/5] Importing Day 3 notebooks into /Shared/Day3..."
+echo ">> [4/5] Importing Day 5 notebooks into /Shared/Day3..."
 curl -s -X POST "${API_BASE}/workspace/mkdirs" \
   "${AUTH_HEADERS[@]}" -H "Content-Type: application/json" \
   -d '{"path": "/Shared/Day3"}' > /dev/null

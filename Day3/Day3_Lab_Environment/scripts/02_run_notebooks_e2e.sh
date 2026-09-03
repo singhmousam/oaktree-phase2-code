@@ -46,9 +46,13 @@ run_notebook() {
         }
       }
     }')
-  RUN_ID=$(echo "${RUN_RESPONSE}" | jq -r '.run_id')
+  # RUN_ID=$(echo "${RUN_RESPONSE}" | jq -r '.run_id')
+  # echo "   Run ID: ${RUN_ID} — poll status with:"
+  # echo "   curl -s ${API_BASE}/jobs/runs/get?run_id=${RUN_ID} \"\${AUTH_HEADERS[@]}\" | jq '.state'"
+  # Extract run_id value
+  RUN_ID=$(echo "${RUN_RESPONSE}" | grep -o '"run_id": *[0-9]*' | cut -d':' -f2 | tr -d ' ')
   echo "   Run ID: ${RUN_ID} — poll status with:"
-  echo "   curl -s ${API_BASE}/jobs/runs/get?run_id=${RUN_ID} \"\${AUTH_HEADERS[@]}\" | jq '.state'"
+  echo "   curl -s \"${API_BASE}/jobs/runs/get?run_id=${RUN_ID}\" \"\${AUTH_HEADERS[@]}\" | grep -o '\"state\": *{[^}]*}'"
   echo "${RUN_ID}"
 }
 
