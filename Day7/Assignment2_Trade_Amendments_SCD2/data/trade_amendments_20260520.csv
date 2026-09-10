@@ -1,0 +1,6 @@
+trade_id,trade_date,security_id,trader_id,trade_type,quantity,price,amendment_reason,amendment_date
+100015,2026-05-01,8,2,SELL,90,902.21,Quantity fat-finger correction confirmed with counterparty (extra zero at booking),2026-05-20
+100035,2026-05-04,3,3,SELL,73000,103.24,Price correction per custodian trade confirmation,2026-05-20
+100019,2026-05-01,5,5,BUY,4200,2348.20,Partial fill adjustment after broker confirm mismatch,2026-05-20
+100045,2026-05-05,2,1,SELL,3800,3188.50,Trade correction following custodian reconciliation break,2026-05-20
+100038,2026-05-04,7,1,SELL,77000,104.65,Price correction - stale quote used at original booking,2026-05-20
