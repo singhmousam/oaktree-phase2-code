@@ -1,0 +1,58 @@
+version: 2
+
+seeds:
+  - name: trade_blotter
+    description: "Raw trade blotter export -- same 567-row sample dataset used across this program."
+    columns:
+      - name: trade_id
+        description: "Business key for a trade. NOT unique in this raw feed -- duplicates simulate a retried load."
+      - name: quantity
+        description: "Signed quantity -- a small number of intentionally bad records are negative."
+
+  - name: dim_trader
+    description: "Trader reference data -- desk and region assignment."
+    columns:
+      - name: trader_id
+        tests:
+          - unique
+          - not_null
+
+models:
+  - name: silver_trades
+    description: "Cleaned, de-duplicated trade data with trade_value computed. Mirrors the Day 2/3 Silver layer exactly."
+    columns:
+      - name: trade_id
+        tests:
+          - unique
+          - not_null
+      - name: trade_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['BUY', 'SELL']
+      - name: quantity
+        description: "Should always be positive — enforced by the model's WHERE clause; this test double-checks it as a safety net in case that logic is ever accidentally changed."
+        tests:
+          - positive_value
+      - name: price
+        description: "Should always be positive — same safety-net reasoning as quantity."
+        tests:
+          - positive_value
+
+  - name: gold_fact_trades_daily
+    description: "Aggregated Gold fact table -- one row per (date, trader, trade_type)."
+    columns:
+      - name: trader_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('gold_dim_trader')
+                field: trader_id
+
+  - name: gold_dim_trader
+    description: "Gold-layer trader dimension (current state only -- see the SCD2 snapshot for history)."
+    columns:
+      - name: trader_id
+        tests:
+          - unique
+          - not_null

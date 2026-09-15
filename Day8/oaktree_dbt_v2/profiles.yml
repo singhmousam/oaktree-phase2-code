@@ -1,0 +1,7 @@
+oaktree_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: 'oaktree_local.duckdb'
+      threads: 4
