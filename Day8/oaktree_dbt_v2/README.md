@@ -8,7 +8,7 @@ throughout this program (DuckDB for Day 1 SQL, local PySpark for Day 3/5).
 ## Setup
 
 ```bash
-pip install dbt-duckdb --break-system-packages   # or in a virtualenv, drop the flag
+pip install dbt-duckdb  # or in a virtualenv, drop the flag
 cd oaktree_dbt
 dbt seed      # loads trade_blotter.csv and dim_trader.csv as raw tables
 dbt run       # builds staging views, silver_trades, and both gold tables
