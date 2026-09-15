@@ -36,8 +36,7 @@ echo "=============================================================="
 echo ">> [1/4] Looking up the Fabric-side capacity ID for '${CAPACITY_NAME}'..."
 TOKEN=$(fabric_token)
 CAPACITIES_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" "${FABRIC_API_BASE}/capacities")
-CAPACITY_ID=$(echo "${CAPACITIES_JSON}" | jq -r --arg name "${CAPACITY_NAME}" \
-  '.value[] | select(.displayName == $name) | .id')
+CAPACITY_ID=$(python3 -c 'import json,sys; data=json.load(sys.stdin); print(next((item["id"] for item in data.get("value", []) if item.get("displayName") == sys.argv[1]), ""))' "${CAPACITY_NAME}" <<< "${CAPACITIES_JSON}")
 
 if [[ -z "${CAPACITY_ID}" || "${CAPACITY_ID}" == "null" ]]; then
   echo "ERROR: Could not find a Fabric capacity named '${CAPACITY_NAME}' via the Fabric API." >&2
@@ -49,7 +48,7 @@ echo "   Fabric capacity ID: ${CAPACITY_ID}"
 echo ">> [2/4] Creating the workspace, assigned to this capacity..."
 WORKSPACE_JSON=$(fabric_api_call POST "/workspaces" \
   "{\"displayName\": \"${WORKSPACE_NAME}\", \"description\": \"OakTree Fabric provisioning exercise\", \"capacityId\": \"${CAPACITY_ID}\"}")
-WORKSPACE_ID=$(echo "${WORKSPACE_JSON}" | jq -r '.id')
+WORKSPACE_ID=$(echo "${WORKSPACE_JSON}" | python3 -c 'import json,sys; data=json.load(sys.stdin); print(data.get("id", ""))')
 
 if [[ -z "${WORKSPACE_ID}" || "${WORKSPACE_ID}" == "null" ]]; then
   echo "ERROR: Workspace creation did not return an id. Full response:" >&2
@@ -61,7 +60,7 @@ echo "   Workspace ID: ${WORKSPACE_ID}"
 echo ">> [3/4] Creating the Lakehouse..."
 LAKEHOUSE_JSON=$(fabric_api_call POST "/workspaces/${WORKSPACE_ID}/lakehouses" \
   "{\"displayName\": \"${LAKEHOUSE_NAME}\"}")
-LAKEHOUSE_ID=$(echo "${LAKEHOUSE_JSON}" | jq -r '.id')
+LAKEHOUSE_ID=$(echo "${LAKEHOUSE_JSON}" | python3 -c 'import json,sys; data=json.load(sys.stdin); print(data.get("id", ""))')
 
 if [[ -z "${LAKEHOUSE_ID}" || "${LAKEHOUSE_ID}" == "null" ]]; then
   echo "ERROR: Lakehouse creation did not return an id. Full response:" >&2

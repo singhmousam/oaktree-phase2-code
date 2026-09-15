@@ -11,8 +11,7 @@ it affects which credentials your `dbt` configuration should actually use.
 
 ```bash
 cd scripts
-chmod +x *.sh
-./run_all.sh oaktreefabric01      # pass a unique suffix per person/team
+./run_all.sh oaktreefabric01      # remember to pass a unique suffix per person/team
 ```
 
 Or run each numbered script individually (useful in a live session, to

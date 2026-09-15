@@ -78,64 +78,13 @@ freely (joins across tables, aggregations, charts in a notebook).
 
 ---
 
-## Part 2 — Why Your Test Didn't Fail (Reproduced and Explained)
-
-**This is a real, common gotcha — not something you did wrong out of
-carelessness.** Here's exactly what happens, reproduced step by step.
-
-### The setup
-
-We edited `seeds/trade_blotter.csv`, changing trade_id 100224's
-`trade_type` from `SELL` to the invalid value `SEL`:
-
-```
-100224,2026-05-19,1,6,SEL,500,1155.56,2026-05-19 17:43:00
-```
-
-### What we tried first (and why it silently passed)
-
-```bash
-dbt test --select accepted_values_silver_trades_trade_type__BUY__SELL
-```
-
-```
-1 of 1 PASS accepted_values_silver_trades_trade_type__BUY__SELL ... [PASS in 0.04s]
-Done. PASS=1 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=1
-```
-
-**This genuinely passed, even with the bad data sitting in the CSV.**
-Here's why:
-
-1. **`dbt test` does not reload your seed files.** Editing
-   `trade_blotter.csv` only changes the file on disk — the actual table
-   inside `oaktree_local.duckdb` still has the OLD data until you run
-   `dbt seed` again.
-2. **`silver_trades` is materialized as a `table`** (see
-   `dbt_project.yml`: `silver: +materialized: table`). A table is a
-   physical snapshot, not a live view — it does not auto-update when an
-   upstream seed changes. You must re-run `dbt run` to rebuild it.
-3. So `dbt test` on its own was checking a **stale table** that still
-   had the original, valid `SELL` value — the edit hadn't propagated
-   anywhere yet.
-
-### The correct sequence
+### The testing sequence to follow
 
 ```bash
 dbt seed   # reload the CSV -> the raw seed table now has "SEL"
 dbt run    # rebuild every model, including silver_trades, from the new data
 dbt test   # NOW check the freshly-rebuilt tables
 ```
-
-```
-1 of 1 FAIL 1 accepted_values_silver_trades_trade_type__BUY__SELL ... [FAIL 1 in 0.05s]
-
-[ERROR]: in test accepted_values_silver_trades_trade_type__BUY__SELL (models/schema.yml)
-  Got 1 result, configured to fail if != 0
-Done. PASS=0 WARN=0 ERROR=1 SKIP=0 NO-OP=0 REUSED=0 TOTAL=1
-```
-
-**There it is.** Same test, same edit — the only difference was
-actually rebuilding the table first.
 
 ### The simplest fix: use `dbt build` instead of separate commands
 
