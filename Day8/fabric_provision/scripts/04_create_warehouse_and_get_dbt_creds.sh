@@ -37,7 +37,7 @@ echo "=============================================================="
 echo ">> [1/4] Creating the Warehouse..."
 WAREHOUSE_JSON=$(fabric_api_call POST "/workspaces/${WORKSPACE_ID}/warehouses" \
   "{\"displayName\": \"${WAREHOUSE_NAME}\"}")
-WAREHOUSE_ID=$(echo "${WAREHOUSE_JSON}" | jq -r '.id')
+WAREHOUSE_ID=$(echo "${WAREHOUSE_JSON}" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("id", ""))')
 
 if [[ -z "${WAREHOUSE_ID}" || "${WAREHOUSE_ID}" == "null" ]]; then
   echo "ERROR: Warehouse creation did not return an id. Full response:" >&2
@@ -50,13 +50,13 @@ echo ">> [2/4] Fetching the Warehouse's SQL connection string (read/write)..."
 TOKEN=$(fabric_token)
 WAREHOUSE_DETAILS=$(curl -s -H "Authorization: Bearer ${TOKEN}" \
   "${FABRIC_API_BASE}/workspaces/${WORKSPACE_ID}/warehouses/${WAREHOUSE_ID}")
-WAREHOUSE_CONNECTION_STRING=$(echo "${WAREHOUSE_DETAILS}" | jq -r '.properties.connectionString')
+WAREHOUSE_CONNECTION_STRING=$(echo "${WAREHOUSE_DETAILS}" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("properties", {}).get("connectionString", ""))')
 echo "   Warehouse connection string: ${WAREHOUSE_CONNECTION_STRING}"
 
 echo ">> [3/4] Fetching the Lakehouse's SQL Analytics Endpoint (read-only, for reference)..."
 LAKEHOUSE_DETAILS=$(curl -s -H "Authorization: Bearer ${TOKEN}" \
   "${FABRIC_API_BASE}/workspaces/${WORKSPACE_ID}/lakehouses/${LAKEHOUSE_ID}")
-LAKEHOUSE_SQL_ENDPOINT=$(echo "${LAKEHOUSE_DETAILS}" | jq -r '.properties.sqlEndpointProperties.connectionString')
+LAKEHOUSE_SQL_ENDPOINT=$(echo "${LAKEHOUSE_DETAILS}" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("properties", {}).get("sqlEndpointProperties", {}).get("connectionString", ""))')
 echo "   Lakehouse SQL endpoint (READ-ONLY): ${LAKEHOUSE_SQL_ENDPOINT}"
 
 echo ">> [4/4] Generating dbt profiles.yml targeting the Warehouse..."

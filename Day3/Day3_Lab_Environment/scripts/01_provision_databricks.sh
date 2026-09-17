@@ -13,7 +13,7 @@
 #   - Day 2's lab_environment.env (for the storage account name/key this
 #     notebook set will read from)
 #   - Azure CLI logged in (`az login`)
-#   - `jq` installed (for parsing JSON responses)
+#   - Python 3 installed (for parsing JSON responses)
 # =============================================================================
 set -euo pipefail
 
@@ -84,7 +84,7 @@ CLUSTER_RESPONSE=$(curl -s -X POST "${API_BASE}/clusters/create" \
       "spark.databricks.delta.preview.enabled": "true"
     }
   }')
-# CLUSTER_ID=$(echo "${CLUSTER_RESPONSE}" | jq -r '.cluster_id')
+# CLUSTER_ID=$(echo "${CLUSTER_RESPONSE}" | python3 -c 'import json,sys; print(json.load(sys.stdin)["cluster_id"])')
 CLUSTER_ID=$(echo "${CLUSTER_RESPONSE}" | grep -o '"cluster_id": *"[^"]*"' | cut -d'"' -f4)
 
 if [ "${CLUSTER_ID}" == "null" ] || [ -z "${CLUSTER_ID}" ]; then

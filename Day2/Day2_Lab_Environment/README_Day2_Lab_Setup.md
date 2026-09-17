@@ -62,19 +62,9 @@ day2_lab/
 
 ### Linux prerequisites
 
-The deployment script uses `jq` to extract the inner `properties` object from
-each ADF JSON artifact. Install it once on the Linux VDI before deployment:
-
-```bash
-# Ubuntu/Debian
-sudo apt-get update && sudo apt-get install -y jq
-
-# RHEL/Fedora
-sudo dnf install -y jq
-
-# Alpine
-sudo apk add jq
-```
+The deployment script uses Python 3's standard-library `json` module to extract
+the inner `properties` object from each ADF JSON artifact. No extra JSON
+command-line package is required.
 
 ```bash
 cd Day2/Day2_Lab_Environment/scripts

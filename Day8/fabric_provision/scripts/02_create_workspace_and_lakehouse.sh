@@ -9,7 +9,7 @@
 #   2. Create a workspace, assigned to that capacity, in one call
 #   3. Create a Lakehouse inside that workspace
 #
-# Requires: ./fabric_environment.env from script 01, `jq` installed.
+# Requires: ./fabric_environment.env from script 01 and Python 3.
 # =============================================================================
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

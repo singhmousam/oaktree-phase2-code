@@ -24,12 +24,18 @@ pause and inspect the Fabric portal between steps):
 ./04_create_warehouse_and_get_dbt_creds.sh
 ```
 
+## Common Errors:
+- Azure lab not started from Upgrad UI
+- Auth error: Access denied: run 'az login' command
+- Git sync error: Discard any local changes
+- azcopy command not found: Install by command: `sudo bash -c 'cd /usr/local/bin; curl -L https://aka.ms/downloadazcopy-v10-linux | tar --strip-components=1 --exclude=*.txt -xzvf -; chmod +x azcopy'`
+- And rerun from Step 3: `
+
 ## Prerequisites
 
 - Azure CLI installed and logged in (`az login`), with a subscription
   that has permission to create resources and is registered for
   Microsoft Fabric capacities
-- `jq` installed (JSON parsing in the helper scripts)
 - `azcopy` installed ([aka.ms/downloadazcopy](https://aka.ms/downloadazcopy)) for script 03
 - Enough Azure permissions to create resource groups and Fabric capacities
   (typically Contributor or higher on the subscription/resource group)

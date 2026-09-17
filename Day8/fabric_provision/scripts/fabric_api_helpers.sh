@@ -39,7 +39,7 @@ poll_fabric_lro() {
     sleep 5
     local resp
     resp=$(curl -s -H "Authorization: Bearer ${token}" "${op_url}")
-    status=$(echo "${resp}" | jq -r '.status // "Unknown"')
+    status=$(echo "${resp}" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status", "Unknown"))')
     echo "  ...operation status: ${status} (poll ${attempt}/60)" >&2
   done
 
