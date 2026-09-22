@@ -6,7 +6,8 @@
 #   1. Look up the Fabric-side GUID for the capacity created in script 01
 #      (the ARM resource ID uses the capacity NAME, not this GUID — the
 #      Fabric API's own "list capacities" call is the reliable way to get it)
-#   2. Create a workspace, assigned to that capacity, in one call
+#   2. Delete any existing workspace with the target name, then recreate it
+#      assigned to that capacity
 #   3. Create a Lakehouse inside that workspace
 #
 # Requires: ./fabric_environment.env from script 01 and Python 3.
@@ -45,7 +46,19 @@ if [[ -z "${CAPACITY_ID}" || "${CAPACITY_ID}" == "null" ]]; then
 fi
 echo "   Fabric capacity ID: ${CAPACITY_ID}"
 
-echo ">> [2/4] Creating the workspace, assigned to this capacity..."
+echo ">> [2/4] Replacing any existing workspace named '${WORKSPACE_NAME}'..."
+WORKSPACES_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" "${FABRIC_API_BASE}/workspaces")
+EXISTING_WORKSPACE_ID=$(python3 -c 'import json,sys; data=json.load(sys.stdin); print(next((item["id"] for item in data.get("value", []) if item.get("displayName") == sys.argv[1]), ""))' "${WORKSPACE_NAME}" <<< "${WORKSPACES_JSON}")
+
+if [[ -n "${EXISTING_WORKSPACE_ID}" && "${EXISTING_WORKSPACE_ID}" != "null" ]]; then
+  echo "   Existing workspace found (${EXISTING_WORKSPACE_ID}); deleting it..."
+  fabric_api_call DELETE "/workspaces/${EXISTING_WORKSPACE_ID}" >/dev/null
+  echo "   Existing workspace deleted."
+else
+  echo "   No existing workspace found."
+fi
+
+echo ">> Creating the workspace, assigned to this capacity..."
 WORKSPACE_JSON=$(fabric_api_call POST "/workspaces" \
   "{\"displayName\": \"${WORKSPACE_NAME}\", \"description\": \"OakTree Fabric provisioning exercise\", \"capacityId\": \"${CAPACITY_ID}\"}")
 WORKSPACE_ID=$(echo "${WORKSPACE_JSON}" | python3 -c 'import json,sys; data=json.load(sys.stdin); print(data.get("id", ""))')
