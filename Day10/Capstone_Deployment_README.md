@@ -18,7 +18,6 @@ it affects which credentials your `dbt` configuration should actually use.
 
 ```bash
 cd scripts
-chmod +x *.sh
 ./run_all.sh oaktreefabric01      # pass a unique suffix per person/team
 ```
 
